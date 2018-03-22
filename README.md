@@ -16,17 +16,17 @@ Jsog is available in PyPI:
 
 This code mimics the standard *json* python package:
 
-    import jsog33
+    from jsog3 import jsog
 
-	string = jsog3.dumps(cyclicGraph);
-	cyclicGraph = jsog3.loads(string);
+	string = jsog.dumps(cyclicGraph);
+	cyclicGraph = jsog.loads(string);
 
 It can be used to convert between object graphs directly:
 
-    import jsog3
+    import jsog
 
-	jsogStructure = jsog3.encode(cyclicGraph);	// has { '@ref': 'ID' } links instead of cycles
-	cyclicGraph = jsog3.decode(jsogStructure);
+	jsogStructure = jsog.encode(cyclicGraph);	// has { '@ref': 'ID' } links instead of cycles
+	cyclicGraph = jsog.decode(jsogStructure);
 
 ## Author
 
