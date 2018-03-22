@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 setup(
 	name='jsog3',
-	version='2.0.3',
+	version='2.0.4',
     packages=['jsog3'],
 	author='Simon Eggler',
 	author_email='simon.eggler@gmx.net',
