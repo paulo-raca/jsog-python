@@ -1,4 +1,4 @@
-import jsog
+from jsog3 import jsog
 import unittest
 
 class TestJSOG(unittest.TestCase):
