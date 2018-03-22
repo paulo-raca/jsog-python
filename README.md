@@ -1,36 +1,37 @@
 # JavaScript Object Graphs with Python
 
-This Python module serializes and deserializes cyclic object graphs in the [JSOG format](https://github.com/jsog/jsog).
+This Python module serializes and deserializes cyclic object graphs in the [JSOG format](https://github.com/simoneggler/jsog-python).
 
 ## Source code
 
-The official repository is (https://github.com/jsog/jsog-python).
+The official repository is (https://github.com/simoneggler/jsog-python).
 
 ## Download
 
 Jsog is available in PyPI:
 
-    $ pip install jsog
+    $ pip install jsog3
 
 ## Usage
 
 This code mimics the standard *json* python package:
 
-    import jsog
+    import jsog33
 
-	string = jsog.dumps(cyclicGraph);
-	cyclicGraph = jsog.loads(string);
+	string = jsog3.dumps(cyclicGraph);
+	cyclicGraph = jsog3.loads(string);
 
 It can be used to convert between object graphs directly:
 
-    import jsog
+    import jsog3
 
-	jsogStructure = jsog.encode(cyclicGraph);	// has { '@ref': 'ID' } links instead of cycles
-	cyclicGraph = jsog.decode(jsogStructure);
+	jsogStructure = jsog3.encode(cyclicGraph);	// has { '@ref': 'ID' } links instead of cycles
+	cyclicGraph = jsog3.decode(jsogStructure);
 
 ## Author
 
 * Jeff Schnitzer (jeff@infohazard.org)
+* Simon Eggler (simon.eggler@gmx.net)
 
 ## License
 
