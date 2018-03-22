@@ -4,7 +4,7 @@ This Python module serializes and deserializes cyclic object graphs in the [JSOG
 
 ## Source code
 
-The official repository is (https://github.com/simoneggler/jsog-python).
+The official repository is (https://github.com/simoneggler/jsog-python) which is a fork of (https://github.com/jsog/jsog-python).
 
 ## Download
 
@@ -23,12 +23,12 @@ This code mimics the standard *json* python package:
 
 It can be used to convert between object graphs directly:
 
-    import jsog
+    from jsog3 import jsog
 
 	jsogStructure = jsog.encode(cyclicGraph);	// has { '@ref': 'ID' } links instead of cycles
 	cyclicGraph = jsog.decode(jsogStructure);
 
-## Author
+## Authors
 
 * Jeff Schnitzer (jeff@infohazard.org)
 * Simon Eggler (simon.eggler@gmx.net)
