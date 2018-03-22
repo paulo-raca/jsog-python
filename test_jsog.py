@@ -60,5 +60,15 @@ class TestJSOG(unittest.TestCase):
 		decoded = jsog.decode(json)
 		self.assertEqual(json, decoded)
 
+	def test_decode_list_reference(self):
+		JSOGIFIED = '{"@id":"1","foo":"foo","inner1":{"@id":"2","bar":"bar"},"inner2":[{"@ref":"2"}]}'
+		parsed = jsog.loads(JSOGIFIED)
+
+		inner1 = parsed['inner1']
+		inner2 = parsed['inner2'][0]
+		self.assertTrue(inner1 is inner2)
+
+
+
 if __name__ == '__main__':
 	unittest.main()

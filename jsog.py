@@ -39,7 +39,7 @@ def encode(original):
 
 			result = sofar[originalId] = { '@id': originalId }
 
-			for key, value in original.iteritems():
+			for key, value in original.items():
 				result[key] = doEncode(value)
 
 			return result
@@ -78,7 +78,7 @@ def decode(encoded):
 			if '@id' in encoded:
 				found[encoded['@id']] = result
 
-			for key, value in encoded.iteritems():
+			for key, value in encoded.items():
 				if key != '@id':
 					result[key] = firstPassDecode(value)
 
@@ -96,14 +96,17 @@ def decode(encoded):
 
 	def deref(withRefs):
 		if isinstance(withRefs, dict):
-			for key, value in withRefs.iteritems():
+			for key, value in withRefs.items():
 				if isinstance(value, dict) and '@ref' in value:
 					withRefs[key] = found[value['@ref']]
 				else:
 					deref(value)
 		elif isinstance(withRefs, list):
 			for value in withRefs:
-				deref(value)
+				if isinstance(value, dict) and '@ref' in value:
+					withRefs[withRefs.index(value)] = found[value['@ref']]
+				else:
+					deref(value)
 
 	firstPass = firstPassDecode(encoded)
 	deref(firstPass)
