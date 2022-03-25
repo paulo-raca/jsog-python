@@ -31,21 +31,25 @@ class TestJSOG(unittest.TestCase):
 	def test_encode_circular(self):
 		thing = {}
 		thing['me'] = thing
+		thing['list'] = [thing]
 
 		encoded = jsog.encode(thing)
 
 		self.assertTrue(encoded['@id'])
 		self.assertTrue(encoded['me']['@ref'] == encoded['@id'])
+		self.assertTrue(encoded['list'][0]['@ref'] == encoded['@id'])
 
 	def test_decode_circular(self):
 		thing = {}
 		thing['me'] = thing
+		thing['list'] = [thing]
 
 		encoded = jsog.encode(thing)
 		back = jsog.decode(encoded)
 
 		self.assertFalse('@id' in back)
 		self.assertTrue(back['me'] is back)
+		self.assertTrue(back['list'][0] is back)
 
 	def test_encode_null(self):
 		encoded = jsog.encode(None)
