@@ -1,5 +1,8 @@
+from collections import defaultdict
+from functools import partial
 import json
 import itertools
+from concurrent.futures import Future
 
 def dump(*args, **kwargs):
 	"""Identical to json.dump(), but produces JSOG"""
@@ -33,7 +36,7 @@ def encode(original):
 	next_id = itertools.count()
 
 	def doEncode(original):
-		def encodeObject(original):
+		if isinstance(original, dict):
 			originalId = id(original)
 			previous = sofar.get(originalId, None)
 			if previous is not None:
@@ -49,13 +52,9 @@ def encode(original):
 
 			return result
 
-		def encodeArray(original):
+		elif isinstance(original, list):
 			return [doEncode(val) for val in original]
 
-		if isinstance(original, list):
-			return encodeArray(original)
-		elif isinstance(original, dict):
-			return encodeObject(original)
 		else:
 			return original
 
@@ -65,54 +64,58 @@ def decode(encoded):
 	""""Take a JSOG-encoded JSON structure and create a new structure which re-links all the references. The return value will
 	not have any @id or @ref fields"""
 	# This works differently from the JavaScript and Ruby versions. Python dicts are unordered, so
-	# we can't be certain to see associated @ids before @refs. Instead we will make two passes,
-	# the first builds the object graph and tracks @ids; the second actually replaces @ref references
-	# with the associated object.
+	# we can't be certain to see associated @ids before @refs. Instead we add hooks to `@ref` references
+	# that are replaced whenever the @id is defined.
 
-	# holds string id -> copied object with that id. in the first pass, it will leave @refs alone.
-	found = {}
+	# holds string id -> Future[object with that id]
+	reference_cache = defaultdict(Future)
 
-	def firstPassDecode(encoded):
-		def firstPassDecodeObject(encoded):
-			if '@ref' in encoded:
-				# first pass leaves these alone
-				return encoded
+	def decode(encoded):
+		if isinstance(encoded, dict):
+			# Handle references
+			if "@ref" in encoded:
+				return reference_cache[encoded["@ref"]]
 
-			result = {}
-
-			if '@id' in encoded:
-				found[encoded['@id']] = result
+			# Decode object
+			ret = {}
 
 			for key, value in encoded.items():
-				if key != '@id':
-					result[key] = firstPassDecode(value)
+				if key == "@id":
+					future = reference_cache[value]
+					if future.done():
+						raise ValueError("Duplicate @id definition: " + repr(value))
+					future.set_result(ret)
+					continue
 
-			return result
+				ret[key] = decoded_value = decode(value)
 
-		def firstPassDecodeArray(encoded):
-			return [firstPassDecode(value) for value in encoded]
+				# Add callbacks on pending reference fields
+				if isinstance(decoded_value, Future):
+					decoded_value.add_done_callback(partial(_reference_resolved, obj=ret, key=key))
 
-		if isinstance(encoded, list):
-			return firstPassDecodeArray(encoded)
-		elif isinstance(encoded, dict):
-			return firstPassDecodeObject(encoded)
+			return ret
+
+		elif isinstance(encoded, list):
+			ret = []
+
+			for i, value in enumerate(encoded):
+				decoded_value = decode(value)
+				ret.append(decoded_value)
+				if isinstance(decoded_value, Future):
+					decoded_value.add_done_callback(partial(_reference_resolved, obj=ret, key=i))
+
+			return ret
 		else:
 			return encoded
 
-	def deref(withRefs):
-		if isinstance(withRefs, dict):
-			for key, value in withRefs.items():
-				if isinstance(value, dict) and '@ref' in value:
-					withRefs[key] = found[value['@ref']]
-				else:
-					deref(value)
-		elif isinstance(withRefs, list):
-			for i, value in enumerate(withRefs):
-				if isinstance(value, dict) and '@ref' in value:
-					withRefs[i] = found[value['@ref']]
-				else:
-					deref(value)
+	ret = decode(encoded)
 
-	firstPass = firstPassDecode(encoded)
-	deref(firstPass)
-	return firstPass
+	# Check for unresolved references
+	for ref, future in reference_cache.items():
+		if not future.done():
+			raise KeyError(ref)
+
+	return ret
+
+def _reference_resolved(future, obj, key):
+	obj[key] = future.result()
