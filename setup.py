@@ -21,7 +21,7 @@ setup(
 
     package_data={
         # If any package contains *.txt or *.rst files, include them:
-        '': ['*.txt', '*.md'],
+        '': ['*.txt', '*.md', 'py.typed', '*.pyi'],
     },
 
     # metadata for upload to PyPI
