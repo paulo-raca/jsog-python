@@ -45,7 +45,7 @@ def encode(original):
 			return result
 
 		def encodeArray(original):
-			return [encode(val) for val in original]
+			return [doEncode(val) for val in original]
 
 		if isinstance(original, list):
 			return encodeArray(original)
@@ -102,9 +102,9 @@ def decode(encoded):
 				else:
 					deref(value)
 		elif isinstance(withRefs, list):
-			for value in withRefs:
+			for i, value in enumerate(withRefs):
 				if isinstance(value, dict) and '@ref' in value:
-					withRefs[withRefs.index(value)] = found[value['@ref']]
+					withRefs[i] = found[value['@ref']]
 				else:
 					deref(value)
 
