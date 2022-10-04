@@ -16,9 +16,11 @@ class TestJSOG(unittest.TestCase):
 		self.assertNotEqual('@ref' in inner1, '@ref' in inner2)
 
 		if '@id' in inner1:
-			self.assertEqual(inner1['@id'], inner2['@ref'])
+			self.assertEqual('0', inner1['@id'])
+			self.assertEqual('0', inner2['@ref'])
 		else:
-			self.assertEqual(inner1['@ref'], inner2['@id'])
+			self.assertEqual('0', inner2['@id'])
+			self.assertEqual('0', inner1['@ref'])
 
 	def test_decode_reference(self):
 		JSOGIFIED = '{"@id":"1","foo":"foo","inner1":{"@id":"2","bar":"bar"},"inner2":{"@ref":"2"}}'
@@ -35,9 +37,11 @@ class TestJSOG(unittest.TestCase):
 
 		encoded = jsog.encode(thing)
 
-		self.assertTrue(encoded['@id'])
-		self.assertTrue(encoded['me']['@ref'] == encoded['@id'])
-		self.assertTrue(encoded['list'][0]['@ref'] == encoded['@id'])
+		self.assertEqual(encoded, {
+			'@id': '0',
+			'me': { '@ref': '0' },
+			'list': [ { '@ref': '0' } ],
+		})
 
 	def test_decode_circular(self):
 		thing = {}

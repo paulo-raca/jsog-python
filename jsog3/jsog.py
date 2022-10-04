@@ -1,4 +1,5 @@
 import json
+import itertools
 
 def dump(*args, **kwargs):
 	"""Identical to json.dump(), but produces JSOG"""
@@ -29,15 +30,19 @@ def encode(original):
 
 	# For every object seen so far, maps stringified id() to the object
 	sofar = {}
+	next_id = itertools.count()
 
 	def doEncode(original):
 		def encodeObject(original):
-			originalId = str(id(original))
+			originalId = id(original)
+			previous = sofar.get(originalId, None)
+			if previous is not None:
+				previous_id = previous.get('@id', None)
+				if previous_id is None:
+					previous_id = previous["@id"] = str(next(next_id))
+				return { '@ref': previous_id }
 
-			if originalId in sofar:
-				return { '@ref': originalId }
-
-			result = sofar[originalId] = { '@id': originalId }
+			result = sofar[originalId] = {}
 
 			for key, value in original.items():
 				result[key] = doEncode(value)
