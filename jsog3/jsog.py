@@ -4,26 +4,24 @@ import json
 import itertools
 from concurrent.futures import Future
 
-def dump(*args, **kwargs):
+def dump(obj, fp, **kwargs):
 	"""Identical to json.dump(), but produces JSOG"""
-	encoded = encode(args[0])
-	args = (encoded,) + args[1:]
-	json.dump(*args, **kwargs)
+	obj = encode(obj)
+	return json.dump(obj, fp, **kwargs)
 
-def dumps(*args, **kwargs):
+def dumps(obj, **kwargs):
 	"""Identical to json.dumps(), but produces JSOG"""
-	encoded = encode(args[0])
-	args = (encoded,) + args[1:]
-	return json.dumps(*args, **kwargs)
+	obj = encode(obj)
+	return json.dumps(obj, **kwargs)
 
-def load(*args, **kwargs):
+def load(fp, **kwargs):
 	"""Identical to json.load(), but understands JSOG. Works on plain JSON, but incurs some additional processing overhead."""
-	obj = json.load(*args, **kwargs)
+	obj = json.load(fp, **kwargs)
 	return decode(obj)
 
-def loads(*args, **kwargs):
+def loads(s, **kwargs):
 	"""Identical to json.loads(), but understands JSOG. Works on plain JSON, but incurs some additional processing overhead."""
-	obj = json.loads(*args, **kwargs)
+	obj = json.loads(s, **kwargs)
 	return decode(obj)
 
 
