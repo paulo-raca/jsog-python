@@ -76,6 +76,21 @@ class TestJSOG(unittest.TestCase):
 		inner2 = parsed['inner2'][0]
 		self.assertTrue(inner1 is inner2)
 
+	def test_decode_missing_id(self):
+		with self.assertRaises(KeyError):
+			json = { "foo": { "@ref": "1" }, "bar": { "@ref": "1" } }
+			jsog.decode(json)
+
+
+	def test_decode_duplicate_id(self):
+		with self.assertRaises(ValueError):
+			json = { "foo": { "@id": "1" }, "bar": { "@id": "1" } }
+			jsog.decode(json)
+
+	def test_decode_root_ref(self):
+		with self.assertRaises(KeyError):
+			json = { "@ref": "0" }
+			jsog.decode(json)
 
 
 if __name__ == '__main__':

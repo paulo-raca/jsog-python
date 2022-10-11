@@ -29,6 +29,10 @@ setup(
         "Bug Tracker": "https://github.com/simoneggler/jsog-python/issuespython",
         "Documentation": "https://github.com/simoneggler/jsog-python/wiki",
         "Source Code": "https://github.com/simoneggler/jsog-python",
+    },
+
+    extras_require={
+        ':python_version == "2.7"': ['futures']
     }
 
     # could also include long_description, download_url, classifiers, etc.
